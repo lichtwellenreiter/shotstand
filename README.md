@@ -1,0 +1,2 @@
+# shotstand
+Trombongos Shotcounter
