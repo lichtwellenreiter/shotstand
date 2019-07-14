@@ -24,7 +24,7 @@
       <DataType>TEXT|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="10" parent="6" name="count">
+    <column id="10" parent="6" name="shotcount">
       <Position>3</Position>
       <DataType>INTEGER|0s</DataType>
     </column>

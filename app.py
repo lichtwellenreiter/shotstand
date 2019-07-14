@@ -25,14 +25,17 @@ def enter():
 @app.route('/safe', methods=['POST'])
 def safe():
     groupname = request.form['groupname']
-    addcount = request.form['count']
+    addcount = request.form['shotcount']
 
     conn = sqlite3.connect(DBNAME)
-    checksql = "select * from shotmeter where groupname = '{groupname}'".format(groupname)
-    groupcheck = conn.execute(checksql)
-    print(groupcheck)
-    sql = "update shotmeter set count = count + {addcount} where groupname = '{groupname}'".format(addcount=addcount,
-                                                                                                   groupname=groupname)
+    # sql = "update shotmeter set count = count + {addcount} where groupname = '{groupname}'".format(addcount=addcount,
+    # groupname=groupname)
+
+    sql = "insert or replace into shotmeter (groupname, shotcount) values ('{groupname}', shotcount + {addcount})".format(
+        groupname=groupname, addcount=addcount)
+
+    print(sql)
+
     conn.execute(sql)
     flash("Anzahl gespeichert für {}".format(groupname))
     return redirect(url_for('enter'))
@@ -56,6 +59,6 @@ def handle_405(error):
 if __name__ == '__main__':
     conn = sqlite3.connect(DBNAME)
     conn.execute(
-        'CREATE TABLE IF NOT EXISTS shotmeter (id INTEGER PRIMARY KEY, groupname TEXT not null , count INTEGER)')
+        'CREATE TABLE IF NOT EXISTS shotmeter (id INTEGER PRIMARY KEY, groupname TEXT not null , shotcount INTEGER)')
     app.run()
     conn.close()
