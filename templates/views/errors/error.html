@@ -1,0 +1,17 @@
+{% extends 'views/errors/error_master.html' %}
+{% block body %}
+
+    <div class="card">
+        <div class="card-body">
+
+            <img src="{{ url_for('static', filename='img/warn.png') }}" class="error-image mb-5"
+                 alt="warning-triangle"/>
+            <h5 class="card-title">Error {{ errornum }}</h5>
+            <p class="card-text">
+                {{ error }}
+                <br/>
+                <a href="/" class="stretched-link">Back to Homepage</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

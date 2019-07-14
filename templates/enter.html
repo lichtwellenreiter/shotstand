@@ -1,0 +1,43 @@
+{% extends 'layouts/master.html' %}
+{% block body %}
+
+<div class="m-5">
+
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/safe">
+        <div class="form-group">
+            <label for="group" class="text-light">Gruppe</label>
+            <input type="text" name="groupname" list="groups" class="form-control bg-dark text-light" id="group"
+                   placeholder="Gruppe">
+        </div>
+        <div class="form-group">
+            <label for="anzahl" class="text-light">Anzahl Shots gekauft</label>
+            <input type="number" name="count" class="form-control bg-dark text-light" id="anzahl" placeholder="Anzahl">
+        </div>
+        <button type="submit" class="btn btn-primary">speichern</button>
+
+        <datalist id="groups">
+            <option value="Internet Explorer">
+            <option value="Firefox">
+            <option value="Chrome">
+            <option value="Opera">
+            <option value="Safari">
+        </datalist>
+
+    </form>
+
+</div>
+{% endblock %}
+
+
+
