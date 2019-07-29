@@ -1,9 +1,10 @@
 Click==7.0
-Flask==1.1.1
+Flask==1.0.3
+gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 PyYAML==5.1.1
 typing==3.7.4
-Werkzeug==0.15.5
+Werkzeug==0.15.4
 yaml-config==0.1.4
