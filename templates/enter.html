@@ -27,11 +27,9 @@
         <button type="submit" class="btn btn-primary">speichern</button>
 
         <datalist id="groups">
-            <option value="Internet Explorer">
-            <option value="Firefox">
-            <option value="Chrome">
-            <option value="Opera">
-            <option value="Safari">
+            {% for name in names %}
+            <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
         </datalist>
 
     </form>
