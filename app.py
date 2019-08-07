@@ -6,7 +6,6 @@ import subprocess
 from sys import platform
 from datetime import datetime
 
-
 app = Flask(__name__)
 json = FlaskJSON(app)
 app.secret_key = b'10a6b4abc946ee7b91aa534a3bf02f3ac5d9a67c126c030464bc4d5f244f7256'
@@ -17,6 +16,14 @@ DBNAME = 'tbgs.db'
 @app.route('/')
 def index():
     return render_template('index.html', msgcount="98632964")
+
+
+@app.route('/getGroups')
+def get_groups():
+    conn = sqlite3.connect(DBNAME)
+    cursor = conn.cursor()
+    cursor.execute('select * from shotmeter order by shotcount desc')
+    return json_response(data=cursor.fetchall())
 
 
 @app.route('/enter')
