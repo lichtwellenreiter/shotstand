@@ -1,8 +1,12 @@
 from flask import Flask
 from flask import render_template, request, redirect, url_for, flash
 import sqlite3
+from flask_json import FlaskJSON, JsonError, json_response, as_json
+import subprocess
+from sys import platform
 
 app = Flask(__name__)
+json = FlaskJSON(app)
 app.secret_key = b'10a6b4abc946ee7b91aa534a3bf02f3ac5d9a67c126c030464bc4d5f244f7256'
 DBNAME = 'tbgs.db'
 
@@ -20,6 +24,21 @@ def enter():
     grps = conn.execute('select groupname from shotmeter')
     groups = grps.fetchall()
     return render_template('enter.html', groups=groups)
+
+
+@app.route('/shutdown', methods=['GET', 'POST'])
+@app.route('/ausschalten', methods=['GET', 'POST'])
+@app.route('/herunterfahren', methods=['GET', 'POST'])
+def shutdown():
+    if request.method == 'POST':
+        if platform == "linux" or platform == "linux2":
+            subprocess.call('sudo shutdown -h now')
+        else:
+            print('on linux i would shutdown now')
+        flash('Shotstand wird heruntergefahren.')
+        return render_template('shutdown.html')
+    else:
+        return render_template('shutdown.html')
 
 
 @app.route('/safe', methods=['POST'])
