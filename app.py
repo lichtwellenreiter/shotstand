@@ -1,13 +1,16 @@
 from flask import Flask
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, logging
 import sqlite3
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 import subprocess
 from sys import platform
+from datetime import datetime
+
 
 app = Flask(__name__)
 json = FlaskJSON(app)
 app.secret_key = b'10a6b4abc946ee7b91aa534a3bf02f3ac5d9a67c126c030464bc4d5f244f7256'
+logger = app.logger
 DBNAME = 'tbgs.db'
 
 
@@ -47,16 +50,37 @@ def safe():
     addcount = request.form['shotcount']
 
     conn = sqlite3.connect(DBNAME)
-    # sql = "update shotmeter set count = count + {addcount} where groupname = '{groupname}'".format(addcount=addcount,
-    # groupname=groupname)
+    cursor = conn.cursor()
 
-    sql = "insert or replace into shotmeter (groupname, shotcount) values ('{groupname}', shotcount + {addcount})".format(
-        groupname=groupname, addcount=addcount)
+    cursor.execute("select * from shotmeter where groupname = '{}' LIMIT 1".format(groupname))
+    rows = cursor.fetchall()
+    print(rows)
 
-    print(sql)
+    if len(rows) > 0:
+        newshots = int(rows[0][2]) + int(addcount)
+        sql = "update shotmeter set shotcount = {newshots} where groupname = '{groupname}'".format(newshots=newshots,
+                                                                                                   groupname=groupname)
+    else:
+        sql = "insert into shotmeter (groupname, shotcount) values ('{groupname}', '{shotcount}')".format(
+            groupname=groupname,
+            shotcount=addcount)
 
-    conn.execute(sql)
-    flash("Anzahl gespeichert für {}".format(groupname))
+    if cursor.execute(sql):
+        conn.commit()
+        flash("{shots} Shots für {groupname} hinzugefügt.".format(shots=addcount, groupname=groupname))
+    else:
+        flash("Fehler beim speichern, bitte noch einmal versuchen.")
+
+    today = datetime.now()
+    cursor.execute(
+        "insert into analytics (groupname, shots_bougth, timestamp) values ('{groupname}',{shots},'{timestamp}')".format(
+            groupname=groupname,
+            shots=int(addcount),
+            timestamp=today))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
     return redirect(url_for('enter'))
 
 
@@ -75,9 +99,23 @@ def handle_405(error):
     return render_template('views/errors/error.html', error=error, errornum=405), 405
 
 
-if __name__ == '__main__':
+@app.before_first_request
+def initalizer():
+    # logging.debug('running initializer')
     conn = sqlite3.connect(DBNAME)
-    conn.execute(
-        'CREATE TABLE IF NOT EXISTS shotmeter (id INTEGER PRIMARY KEY, groupname TEXT not null , shotcount INTEGER)')
-    app.run()
+    conn.execute('CREATE TABLE IF NOT EXISTS shotmeter ('
+                 'id INTEGER PRIMARY KEY, '
+                 'groupname TEXT not null , '
+                 'shotcount INTEGER'
+                 ')')
+    conn.execute('CREATE TABLE IF NOT EXISTS analytics('
+                 'id INTEGER PRIMARY KEY,'
+                 'groupname TEXT NOT NULL,'
+                 'shots_bougth INTEGER NOT NULL,'
+                 'timestamp TEXT NOT NULL'
+                 ')')
     conn.close()
+
+
+if __name__ == '__main__':
+    app.run()
