@@ -1,29 +1,37 @@
 from flask import Flask
-from flask import render_template, request, redirect, url_for, flash, logging
+from flask import render_template, request, redirect, url_for, flash
 import sqlite3
-from flask_json import FlaskJSON, JsonError, json_response, as_json
+from flask_json import FlaskJSON, json_response
 import subprocess
 from sys import platform
 from datetime import datetime
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 json = FlaskJSON(app)
+cors = CORS(app)
 app.secret_key = b'10a6b4abc946ee7b91aa534a3bf02f3ac5d9a67c126c030464bc4d5f244f7256'
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 logger = app.logger
 DBNAME = 'tbgs.db'
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', msgcount="98632964")
+    return render_template('index.html')
 
 
 @app.route('/getGroups')
+@cross_origin()
 def get_groups():
     conn = sqlite3.connect(DBNAME)
     cursor = conn.cursor()
-    cursor.execute('select * from shotmeter order by shotcount desc')
-    return json_response(data=cursor.fetchall())
+    cursor.execute('select groupname as groupname, shotcount as shot from shotmeter order by shotcount desc')
+    group_data = cursor.fetchall()
+    group_data.insert(0, ["groupname", "shotcount"])
+    print(group_data)
+    return json_response(data=group_data)
 
 
 @app.route('/enter')

@@ -1,82 +1,131 @@
 {% extends 'layouts/master.html' %}
 {% block body %}
 
-<div class="row">
-    <img src="{{ url_for('static', filename='img/tbgs_logo_transparent.png') }}" class="header-image">
-</div>
+    <div class="row">
+        <img src="{{ url_for('static', filename='img/tbgs_logo_transparent.png') }}" class="header-image">
+    </div>
 
-<div class="row mt-5">
-    <div class="col-6">
-        <div class="card bg-dark border-0">
-            <div class="card-body">
-                <div id="donutchart" style="width: 900px; height: 500px;"></div>
+    <div class="row mt-5">
+        <div class="col-6">
+            <div class="card bg-dark border-0">
+                <div class="card-body">
+                    <div id="donutchart" style="width: 900px; height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card bg-dark border-0">
+                <div class="card-body">
+                    <table class="table text-light">
+                        <thead>
+                        <tr>
+                            <th scope="col">Gruppe</th>
+                            <th scope="col">Anzahl</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for group in groups %}
+                            <tr>
+                                <td>{{ group[1] }}</td>
+                                <td>{{ group[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-6">
-        <div class="card bg-dark border-0">
-            <div class="card-body">
-                <table class="table text-light">
-                    <thead>
-                    <tr>
-                        <th scope="col">Gruppe</th>
-                        <th scope="col">Anzahl</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for group in groups %}
-                    <tr>
-                        <td >{{group[1]}}</td>
-                        <td>{{group[2]}}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+    <script type="text/javascript">
 
-<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-<script type="text/javascript">
-    google.charts.load("current", {packages: ["corechart"]});
-    google.charts.setOnLoadCallback(drawChart);
+        let chartData = [];
 
-    // https://plot.ly/javascript/pie-charts/
-
-    function drawChart() {
-        let data = google.visualization.arrayToDataTable([
-            ['Gruppe', 'Shots'],
-            ['Mark', 156],
-        ]);
-
-        let options = {
-            title: 'Trombongoes Stadtfest',
-            titleTextStyle: {
-                color: '#f8f9fa',
-                fontSize: 20
-            },
-            pieHole: 0.4,
-            backgroundColor: '#343a40',
-            legend: {
-                textStyle: {
-                    color: '#f8f9fa'
-                },
-                position: 'left'
-            },
-            chartArea: {
-                left: -20,
-                top: 0,
-                width: '100%',
-                height: '100%'
+        doGet('/getGroups', (err, data) => {
+            console.debug('doing getGroup call')
+            if (err !== null) {
+                console.error('could not getting Data. Is the backend Server running?');
+                alert('Cannot calling Group Data \n' +
+                    'Error raised: ' + err.number + '\n' +
+                    'Is the server running?');
+            } else {
+                console.debug('got data: ');
+                console.debug(data.data);
+                chartData = data;
             }
-        };
+        });
 
-        let chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-        chart.draw(data, options);
-    }
-</script>
+        google.charts.load("current", {packages: ["corechart"]});
+        google.charts.setOnLoadCallback(drawChart);
+
+        // https://plot.ly/javascript/pie-charts/
+
+        function drawChart() {
+            let data = google.visualization.arrayToDataTable([
+                {#['Gruppe', 'Shots'],#}
+                {#['Mark', 156],#}
+                chartData
+            ]);
+
+            let options = {
+                title: 'Trombongoes Stadtfest',
+                titleTextStyle: {
+                    color: '#f8f9fa',
+                    fontSize: 20
+                },
+                pieHole: 0.4,
+                backgroundColor: '#343a40',
+                legend: {
+                    textStyle: {
+                        color: '#f8f9fa'
+                    },
+                    position: 'left'
+                },
+                chartArea: {
+                    left: -20,
+                    top: 0,
+                    width: '100%',
+                    height: '100%'
+                }
+            };
+
+            let chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+            chart.draw(data, options);
+        }
+
+        /**
+         * Execute GET Request against Server
+         * @param resource
+         * @param callback
+         */
+        function doGet(ressource, callback) {
+
+            let url = 'http://localhost:5000' + ressource;
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'json';
+            xhr.onload = function () {
+                let status = xhr.status;
+                let message = xhr.statusText;
+
+                if (status === 200) {
+                    callback(null, xhr.response);
+                } else {
+
+                    let error = {
+                        "number": status,
+                        "message": message
+                    };
+
+                    callback(error, xhr.response);
+                }
+            };
+            xhr.send();
+        }
+
+    </script>
 
 {% endblock %}
 
