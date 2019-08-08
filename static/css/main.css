@@ -1,7 +1,9 @@
 * {
     border-radius: 0 !important;
 }
-
+body{
+    background-color: #32373A;
+}
 .header-image {
     height: 200px;
     display: block;

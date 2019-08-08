@@ -8,7 +8,7 @@ from datetime import datetime
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-json = FlaskJSON(app)
+flaskjson = FlaskJSON(app)
 cors = CORS(app)
 app.secret_key = b'10a6b4abc946ee7b91aa534a3bf02f3ac5d9a67c126c030464bc4d5f244f7256'
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -27,11 +27,19 @@ def index():
 def get_groups():
     conn = sqlite3.connect(DBNAME)
     cursor = conn.cursor()
-    cursor.execute('select groupname as groupname, shotcount as shot from shotmeter order by shotcount desc')
+    cursor.execute('select groupname, shotcount from shotmeter order by shotcount desc')
     group_data = cursor.fetchall()
-    group_data.insert(0, ["groupname", "shotcount"])
-    print(group_data)
-    return json_response(data=group_data)
+
+    return_data = []
+
+    for group in group_data:
+        print(group)
+        datapoint = {'y': group[1], 'label': group[0]}
+        return_data.append(datapoint)
+
+    print(return_data)
+
+    return json_response(data=return_data)
 
 
 @app.route('/enter')
