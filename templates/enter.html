@@ -6,7 +6,7 @@
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <div class="alert alert-danger" role="alert">
+    <div class="alert alert-danger" id="alert_message" role="alert">
         {% for message in messages %}
         {{ message }}
         {% endfor %}
@@ -14,7 +14,7 @@
     {% endif %}
     {% endwith %}
 
-    <form method="post" action="/safe">
+    <form method="post" action="/safe" autocomplete="off">
         <div class="form-group">
             <label for="group" class="text-light">Gruppe</label>
             <input type="text" name="groupname" list="groups" class="form-control bg-dark text-light" id="group"
@@ -27,14 +27,21 @@
         <button type="submit" class="btn btn-primary">speichern</button>
 
         <datalist id="groups">
-            {% for name in names %}
-            <option value="{{ name }}">{{ name }}</option>
+            {% for group in groups %}
+            <option value="{{ group[0] }}">{{ group[0] }}</option>
             {% endfor %}
         </datalist>
 
     </form>
 
 </div>
+<script>
+window.setTimeout(function() {
+  $("#alert_message").fadeTo(500, 0).slideUp(500, function(){
+    $(this).remove(); 
+  });
+}, 3000);
+</script>
 {% endblock %}
 
 

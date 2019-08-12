@@ -1,0 +1,13 @@
+[Unit]
+Description=Trombongoes Shotstand
+After=network.target
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/var/shotstand
+Environment="PATH=/var/shotstand/shotvenv/bin"
+ExecStart=/var/shotstand/shotvenv/bin/gunicorn --workers 3 --bind unix:shotstand.sock -m 007 app:app
+
+[Install]
+WantedBy=multi-user.target

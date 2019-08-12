@@ -37,7 +37,7 @@ def get_groups():
         datapoint = {'y': group[1], 'label': group[0]}
         return_data.append(datapoint)
 
-    print(return_data)
+    # print(return_data)
 
     return json_response(data=return_data)
 
@@ -49,6 +49,7 @@ def enter():
     conn = sqlite3.connect(DBNAME)
     grps = conn.execute('select groupname from shotmeter')
     groups = grps.fetchall()
+    print(groups)
     return render_template('enter.html', groups=groups)
 
 
@@ -77,7 +78,7 @@ def safe():
 
     cursor.execute("select * from shotmeter where groupname = '{}' LIMIT 1".format(groupname))
     rows = cursor.fetchall()
-    print(rows)
+    # print(rows)
 
     if len(rows) > 0:
         newshots = int(rows[0][2]) + int(addcount)

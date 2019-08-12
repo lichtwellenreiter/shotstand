@@ -1,3 +1,3 @@
-source simpleappenv/bin/activate
-gunicorn --workers 5 --bind unix:simpleapp.sock -m 007 src:app
+source shotvenv/bin/activate
+gunicorn --workers 3 --bind unix:shotstand.sock  -m 007 app:app
 deactivate

@@ -17,6 +17,9 @@
         <div class="col-6">
             <div class="card bg-transparent border-0">
                 <div class="card-body">
+                    <div class="row">
+                    <small class="text-light" id="updated"></small>
+                    </div>
                     <table class="table text-light">
                         <thead>
                         <tr>
@@ -60,9 +63,18 @@
                     chartData = data.data;
                     createChart();
                     createTable();
+                    updateTime();
                 }
             });
 
+        }
+        
+        function updateTime(){
+            let newDate = new Date();
+            let datetime = "LastSync: " + newDate.today() + " @ " + newDate.timeNow();
+            let updateNag = document.getElementById("updated");
+            updateNag.innerHtml = datetime;
+            console.log(datetime);
         }
 
         function createChart(){
@@ -99,7 +111,7 @@
          */
         function doGet(resource, callback) {
 
-            let url = 'http://localhost:5000' + resource;
+            let url = 'http://'+ window.location.hostname  + resource;
             let xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.responseType = 'json';
@@ -120,6 +132,16 @@
                 }
             };
             xhr.send();
+        }
+        
+        // For todays date;
+        Date.prototype.today = function () { 
+            return ((this.getDate() < 10)?"0":"") + this.getDate() +"."+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"."+ this.getFullYear();
+        }
+
+        // For the time now
+        Date.prototype.timeNow = function () {
+            return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
         }
 
     </script>
