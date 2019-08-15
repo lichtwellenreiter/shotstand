@@ -82,7 +82,12 @@ def safe():
     # print(rows)
 
     if len(rows) > 0:
-        newshots = int(rows[0][2]) + int(addcount)
+        
+        if int(rows[0][2]) + int(addcount) <= 0:
+            newshots = 0
+        else:
+            newshots = int(rows[0][2]) + int(addcount)
+            
         sql = "update shotmeter set shotcount = {newshots} where groupname = '{groupname}'".format(newshots=newshots,
                                                                                                    groupname=groupname)
     else:
