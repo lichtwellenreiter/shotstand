@@ -27,7 +27,7 @@ def index():
 def get_groups():
     conn = sqlite3.connect(DBNAME)
     cursor = conn.cursor()
-    cursor.execute('select groupname, shotcount from shotmeter where shotcount > 0order by shotcount desc')
+    cursor.execute('select groupname, shotcount from shotmeter where shotcount > 0 order by shotcount desc')
     group_data = cursor.fetchall()
 
     return_data = []
