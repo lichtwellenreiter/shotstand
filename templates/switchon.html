@@ -1,0 +1,26 @@
+{% extends 'layouts/master.html' %}
+{% block body %}
+
+<div class="m-5 text-center">
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/switchon">
+        <p><label class="text-light" for="shutdown-button">Display einschalten</label></p>
+        <button type="submit" class="btn btn-link border border-light rounded" id="shutdown-button">
+            <img src="{{ url_for('static', filename='img/shutdown.png') }}">
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+
+

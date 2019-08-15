@@ -1,0 +1,12 @@
+[Unit]
+Description=Trombongoes Shotstand Kiosk
+After=network.target shotstand.service
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/var/shotstand
+ExecStart=/kiosk.sh
+
+[Install]
+WantedBy=multi-user.target

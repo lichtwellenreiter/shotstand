@@ -59,14 +59,15 @@ def enter():
 def shutdown():
     if request.method == 'POST':
         if platform == "linux" or platform == "linux2":
-            subprocess.call('sudo shutdown -h now')
+            command = "/usr/bin/sudo /sbin/shutdown -h now"
+            process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+            output = process.communicate()[0]
         else:
             print('on linux i would shutdown now')
         flash('Shotstand wird heruntergefahren.')
         return render_template('shutdown.html')
     else:
         return render_template('shutdown.html')
-
 
 @app.route('/safe', methods=['POST'])
 def safe():
@@ -142,4 +143,7 @@ def initalizer():
 
 
 if __name__ == '__main__':
+    
+    import logging
+    logging.basicConfig(filename='error.log',level=logging.DEBUG)
     app.run()
