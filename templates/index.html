@@ -18,9 +18,9 @@
             <div class="card bg-transparent border-0">
                 <div class="card-body">
                     <div class="row">
-                    <small class="text-light" id="updated"></small>
+                    <h1 class="display-4 text-light">Top 15</h1>
                     </div>
-                    <table class="table text-light">
+                    <table class="table text-light table-sm">
                         <thead>
                         <tr>
                             <th scope="col"></th>
@@ -30,6 +30,9 @@
                         </thead>
                         <tbody id="grouptable"></tbody>
                     </table>
+                    <!--div class="row">
+                    <h1 class="display-4 text-light" id="total">Total</h1>
+                    </div-->
                 </div>
             </div>
         </div>
@@ -46,9 +49,6 @@
 
         function runner() {
 
-            // Cleanup Table
-            tbody.innerHTML = '';
-
             doGet('/getGroups', (err, data) => {
                 console.debug('doing getGroup call');
                 if (err !== null) {
@@ -57,16 +57,29 @@
                         'Error raised: ' + err.number + '\n' +
                         'Is the server running?');
                 } else {
-                    console.debug('got data: ');
-                    console.debug(data.data);
-                    console.table(data.data);
                     chartData = data.data;
                     createChart();
+                    
+                    // Cleanup Table
+                    tbody.innerHTML = '';
                     createTable();
-                    updateTime();
+                    // updateTime();
+                    // updateTotal();
                 }
             });
 
+        }
+        
+        function updateTotal(){
+            doGet('/getTotal', (err, data) => {
+                console.log('hello');
+                if(err != null){
+                    alert('Cannot getTotal. Is the server running?');
+                }else{
+                    console.log('total is ' + data.data);
+                    document.getElementById('total').innerHtml = 'Total ' + data.data;
+                }
+            });    
         }
         
         function updateTime(){

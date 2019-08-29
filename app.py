@@ -27,7 +27,7 @@ def index():
 def get_groups():
     conn = sqlite3.connect(DBNAME)
     cursor = conn.cursor()
-    cursor.execute('select groupname, shotcount from shotmeter where shotcount > 0 order by shotcount desc')
+    cursor.execute('select groupname, shotcount from shotmeter where shotcount > 0 order by shotcount desc limit 15')
     group_data = cursor.fetchall()
 
     return_data = []
@@ -41,6 +41,16 @@ def get_groups():
 
     return json_response(data=return_data)
 
+@app.route('/getTotal')
+def total():
+    conn = sqlite3.connect(DBNAME)
+    cnt = conn.execute('select shotcount from shotmeter')
+    tcnt = cnt.fetchall()
+    totsht = 0
+    for shots in tcnt:
+        totsht += shots[0]
+    
+    return json_response(data=totsht)
 
 @app.route('/enter')
 @app.route('/eintrag')
