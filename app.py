@@ -33,13 +33,14 @@ def get_groups():
     return_data = []
 
     for group in group_data:
-        print(group)
+        # print(group)
         datapoint = {'y': group[1], 'label': group[0]}
         return_data.append(datapoint)
 
     # print(return_data)
 
     return json_response(data=return_data)
+
 
 @app.route('/getTotal')
 def total():
@@ -49,8 +50,9 @@ def total():
     totsht = 0
     for shots in tcnt:
         totsht += shots[0]
-    
+
     return json_response(data=totsht)
+
 
 @app.route('/enter')
 @app.route('/eintrag')
@@ -59,7 +61,7 @@ def enter():
     conn = sqlite3.connect(DBNAME)
     grps = conn.execute('select groupname from shotmeter')
     groups = grps.fetchall()
-    print(groups)
+    # print(groups)
     return render_template('enter.html', groups=groups)
 
 
@@ -79,6 +81,7 @@ def shutdown():
     else:
         return render_template('shutdown.html')
 
+
 @app.route('/safe', methods=['POST'])
 def safe():
     groupname = request.form['groupname']
@@ -92,12 +95,12 @@ def safe():
     # print(rows)
 
     if len(rows) > 0:
-        
+
         if int(rows[0][2]) + int(addcount) <= 0:
             newshots = 0
         else:
             newshots = int(rows[0][2]) + int(addcount)
-            
+
         sql = "update shotmeter set shotcount = {newshots} where groupname = '{groupname}'".format(newshots=newshots,
                                                                                                    groupname=groupname)
     else:
@@ -158,7 +161,6 @@ def initalizer():
 
 
 if __name__ == '__main__':
-    
     import logging
-    logging.basicConfig(filename='error.log',level=logging.DEBUG)
+    logging.basicConfig(filename='app.log', level=logging.DEBUG)
     app.run()

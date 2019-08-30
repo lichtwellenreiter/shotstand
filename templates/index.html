@@ -2,7 +2,8 @@
 {% block body %}
 
     <div class="row">
-        <img src="{{ url_for('static', filename='img/tbgs_logo_transparent.png') }}" alt="TrombongoesStadtfest" class="header-image">
+        <img src="{{ url_for('static', filename='img/tbgs_logo_transparent.png') }}" alt="TrombongoesStadtfest"
+             class="header-image">
     </div>
 
     <div class="row mt-5">
@@ -18,7 +19,7 @@
             <div class="card bg-transparent border-0">
                 <div class="card-body">
                     <div class="row">
-                    <h1 class="display-4 text-light">Top 15</h1>
+                        <h1 class="display-4 text-light">Top 15</h1>
                     </div>
                     <table class="table text-light table-sm">
                         <thead>
@@ -30,16 +31,20 @@
                         </thead>
                         <tbody id="grouptable"></tbody>
                     </table>
-                    <!--div class="row">
-                    <h1 class="display-4 text-light" id="total">Total</h1>
-                    </div-->
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-light" id="total">Total</h1>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/canvasjs.min.js') }}"></script>
     <script type="text/javascript">
+
+        // console.log(navigator.platform);
 
         let chartData = [];
         let tbody = document.getElementById('grouptable');
@@ -50,7 +55,7 @@
         function runner() {
 
             doGet('/getGroups', (err, data) => {
-                console.debug('doing getGroup call');
+                // console.debug('doing getGroup call');
                 if (err !== null) {
                     console.error('could not getting Data. Is the backend Server running?');
                     alert('Cannot calling Group Data \n' +
@@ -59,38 +64,40 @@
                 } else {
                     chartData = data.data;
                     createChart();
-                    
+
                     // Cleanup Table
                     tbody.innerHTML = '';
                     createTable();
                     // updateTime();
-                    // updateTotal();
+                    updateTotal();
                 }
             });
 
         }
-        
-        function updateTotal(){
+
+        function updateTotal() {
             doGet('/getTotal', (err, data) => {
-                console.log('hello');
-                if(err != null){
+                // console.log('hello');
+                if (err != null) {
                     alert('Cannot getTotal. Is the server running?');
-                }else{
-                    console.log('total is ' + data.data);
-                    document.getElementById('total').innerHtml = 'Total ' + data.data;
+                } else {
+                    // console.log('total is ' + data.data);
+                    let totalelem = document.getElementById('total');
+                    totalelem.innerHTML = 'Total ' + data.data;
+                    // console.log(totalelem);
                 }
-            });    
+            });
         }
-        
-        function updateTime(){
+
+        function updateTime() {
             let newDate = new Date();
             let datetime = "LastSync: " + newDate.today() + " @ " + newDate.timeNow();
             let updateNag = document.getElementById("updated");
             updateNag.innerHtml = datetime;
-            console.log(datetime);
+            // console.log(datetime);
         }
 
-        function createChart(){
+        function createChart() {
             let chart = new CanvasJS.Chart("chartContainer", {
                 theme: "dark2",
                 animationEnabled: false,
@@ -124,7 +131,13 @@
          */
         function doGet(resource, callback) {
 
-            let url = 'http://'+ window.location.hostname  + resource;
+            let port = "";
+
+            if (navigator.platform === "MacIntel") {
+                port = ":5000";
+            }
+
+            let url = 'http://' + window.location.hostname + port + resource;
             let xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.responseType = 'json';
@@ -146,15 +159,15 @@
             };
             xhr.send();
         }
-        
+
         // For todays date;
-        Date.prototype.today = function () { 
-            return ((this.getDate() < 10)?"0":"") + this.getDate() +"."+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"."+ this.getFullYear();
+        Date.prototype.today = function () {
+            return ((this.getDate() < 10) ? "0" : "") + this.getDate() + "." + (((this.getMonth() + 1) < 10) ? "0" : "") + (this.getMonth() + 1) + "." + this.getFullYear();
         }
 
         // For the time now
         Date.prototype.timeNow = function () {
-            return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+            return ((this.getHours() < 10) ? "0" : "") + this.getHours() + ":" + ((this.getMinutes() < 10) ? "0" : "") + this.getMinutes() + ":" + ((this.getSeconds() < 10) ? "0" : "") + this.getSeconds();
         }
 
     </script>
