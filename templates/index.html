@@ -45,6 +45,7 @@
     <script type="text/javascript">
 
         // console.log(navigator.platform);
+        // console.log(location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
 
         let chartData = [];
         let tbody = document.getElementById('grouptable');
@@ -83,7 +84,7 @@
                 } else {
                     // console.log('total is ' + data.data);
                     let totalelem = document.getElementById('total');
-                    totalelem.innerHTML = 'Total ' + data.data;
+                    totalelem.innerHTML = 'Total ' + data.total;
                     // console.log(totalelem);
                 }
             });

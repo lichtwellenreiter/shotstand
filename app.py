@@ -50,8 +50,7 @@ def total():
     totsht = 0
     for shots in tcnt:
         totsht += shots[0]
-
-    return json_response(data=totsht)
+    return json_response(total=totsht)
 
 
 @app.route('/enter')
@@ -87,44 +86,49 @@ def safe():
     groupname = request.form['groupname']
     addcount = request.form['shotcount']
 
-    conn = sqlite3.connect(DBNAME)
-    cursor = conn.cursor()
+    if groupname != "" and addcount != "":
+        conn = sqlite3.connect(DBNAME)
+        cursor = conn.cursor()
 
-    cursor.execute("select * from shotmeter where groupname = '{}' LIMIT 1".format(groupname))
-    rows = cursor.fetchall()
-    # print(rows)
+        cursor.execute("select * from shotmeter where groupname = '{}' LIMIT 1".format(groupname))
+        rows = cursor.fetchall()
+        # print(rows)
 
-    if len(rows) > 0:
+        if len(rows) > 0:
 
-        if int(rows[0][2]) + int(addcount) <= 0:
-            newshots = 0
+            if int(rows[0][2]) + int(addcount) <= 0:
+                newshots = 0
+            else:
+                newshots = int(rows[0][2]) + int(addcount)
+
+            sql = "update shotmeter set shotcount = {newshots} where groupname = '{groupname}'".format(
+                newshots=newshots,
+                groupname=groupname)
         else:
-            newshots = int(rows[0][2]) + int(addcount)
+            sql = "insert into shotmeter (groupname, shotcount) values ('{groupname}', '{shotcount}')".format(
+                groupname=groupname,
+                shotcount=addcount)
 
-        sql = "update shotmeter set shotcount = {newshots} where groupname = '{groupname}'".format(newshots=newshots,
-                                                                                                   groupname=groupname)
-    else:
-        sql = "insert into shotmeter (groupname, shotcount) values ('{groupname}', '{shotcount}')".format(
-            groupname=groupname,
-            shotcount=addcount)
+        if cursor.execute(sql):
+            conn.commit()
+            flash("{shots} Shots für {groupname} hinzugefügt.".format(shots=addcount, groupname=groupname))
+        else:
+            flash("Fehler beim speichern, bitte noch einmal versuchen.")
 
-    if cursor.execute(sql):
+        today = datetime.now()
+        cursor.execute(
+            "insert into analytics (groupname, shots_bougth, timestamp) values ('{groupname}',{shots},'{timestamp}')".format(
+                groupname=groupname,
+                shots=int(addcount),
+                timestamp=today))
         conn.commit()
-        flash("{shots} Shots für {groupname} hinzugefügt.".format(shots=addcount, groupname=groupname))
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('enter'))
     else:
-        flash("Fehler beim speichern, bitte noch einmal versuchen.")
-
-    today = datetime.now()
-    cursor.execute(
-        "insert into analytics (groupname, shots_bougth, timestamp) values ('{groupname}',{shots},'{timestamp}')".format(
-            groupname=groupname,
-            shots=int(addcount),
-            timestamp=today))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return redirect(url_for('enter'))
+        flash("Bitte die Daten korrigieren")
+        return redirect(url_for('enter'))
 
 
 @app.errorhandler(500)
@@ -162,5 +166,6 @@ def initalizer():
 
 if __name__ == '__main__':
     import logging
+
     logging.basicConfig(filename='app.log', level=logging.DEBUG)
     app.run()
