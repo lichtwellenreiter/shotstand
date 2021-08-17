@@ -10,7 +10,7 @@ sed -i 's/"exit_type":"Crashed"/"exit_type":"Normal"/' /home/pi/.config/chromium
 
 #-- /usr/bin/chromium-browser --noerrdialogs --disable-infobars --kiosk http://localhost &
 
-midori http://localhost &
+midori http://localhost:5000 &
 
 sleep 7
 xdotool key --clearmodifiers F11
