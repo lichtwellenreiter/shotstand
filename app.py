@@ -142,7 +142,7 @@ def handle_405(error):
     return render_template('views/errors/error.html', error=error, errornum=405), 405
 
 
-@app.before_first_request
+#@app.before_first_request
 def initalizer():
     # logging.debug('running initializer')
     conn = sqlite3.connect(DBNAME)
@@ -163,4 +163,8 @@ def initalizer():
 if __name__ == '__main__':
     import logging
     logging.basicConfig(filename='app.log', level=logging.DEBUG)
+
+    with app.app_context():
+        initializer()
+
     app.run()
