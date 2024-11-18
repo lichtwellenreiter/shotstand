@@ -1,11 +1,11 @@
 from flask import Flask
 from flask import render_template, request, redirect, url_for, flash
 import sqlite3
-from flask_json import FlaskJSON, json_response
 import subprocess
 from sys import platform
 from datetime import datetime
 from flask_cors import CORS, cross_origin
+from flask_json import FlaskJSON, json_response
 
 app = Flask(__name__)
 flaskjson = FlaskJSON(app)
@@ -15,6 +15,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 logger = app.logger
 DBNAME = 'tbgs.db'
+first_request = True
 
 
 @app.route('/')
@@ -142,29 +143,29 @@ def handle_405(error):
     return render_template('views/errors/error.html', error=error, errornum=405), 405
 
 
-#@app.before_first_request
+@app.before_request
 def initalizer():
-    # logging.debug('running initializer')
-    conn = sqlite3.connect(DBNAME)
-    conn.execute('CREATE TABLE IF NOT EXISTS shotmeter ('
-                 'id INTEGER PRIMARY KEY, '
-                 'groupname TEXT not null , '
-                 'shotcount INTEGER'
-                 ')')
-    conn.execute('CREATE TABLE IF NOT EXISTS analytics('
-                 'id INTEGER PRIMARY KEY,'
-                 'groupname TEXT NOT NULL,'
-                 'shots_bougth INTEGER NOT NULL,'
-                 'timestamp TEXT NOT NULL'
-                 ')')
-    conn.close()
+    global first_request
+    if first_request:
+        # logging.debug('running initializer')
+        conn = sqlite3.connect(DBNAME)
+        conn.execute('CREATE TABLE IF NOT EXISTS shotmeter ('
+                     'id INTEGER PRIMARY KEY, '
+                     'groupname TEXT not null , '
+                     'shotcount INTEGER'
+                     ')')
+        conn.execute('CREATE TABLE IF NOT EXISTS analytics('
+                     'id INTEGER PRIMARY KEY,'
+                     'groupname TEXT NOT NULL,'
+                     'shots_bougth INTEGER NOT NULL,'
+                     'timestamp TEXT NOT NULL'
+                     ')')
+        conn.close()
+
+        first_request = False
 
 
 if __name__ == '__main__':
     import logging
     logging.basicConfig(filename='app.log', level=logging.DEBUG)
-
-    with app.app_context():
-        initializer()
-
-    app.run()
+    app.run(port=5000)

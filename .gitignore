@@ -106,3 +106,4 @@ venv.bak/
 .idea
 tbgs.db
 shotstand.sock
+/shotenv/
